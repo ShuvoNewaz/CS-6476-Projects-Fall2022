@@ -1,0 +1,9 @@
+required_directories:
+  - src
+required_files:
+  - setup.cfg
+  - pyproject.toml
+optional_directories:
+  - additional_data
+optional_files:
+  - README.txt
