@@ -4,7 +4,7 @@ import yaml
 
 FILE_SIZE_LIMIT = 15000000
 OUT_FILENAME = "cv_proj4"
-FILE_LIST_YAML = ".zip_dir_list.yml"
+FILE_LIST_YAML = ".colab_zip_dir_list.yml"
 
 
 def copy(src: str, dest: str, directory: bool, required: bool) -> None:
