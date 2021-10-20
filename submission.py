@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     out_file = args.gt_username + ".zip"
     shutil.make_archive(args.gt_username, "zip", "temp_submission")
-    if os.path.getsize(out_file) > 15000000:
+    if os.path.getsize(out_file) > 60000000:
         os.remove(out_file)
         print("SUBMISSION DID NOT ZIP, ZIPPED SIZE > 15MB")
     shutil.rmtree("temp_submission", ignore_errors=True)
