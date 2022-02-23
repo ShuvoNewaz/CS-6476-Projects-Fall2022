@@ -1,0 +1,19 @@
+name: cv_proj3
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - bandit
+  - flake8
+  - jupyter
+  - matplotlib
+  - mypy
+  - numpy
+  - pytest
+  - python>=3.6
+  - pyyaml
+  - pytorch-cpu
+  - torchvision-cpu=0.2
+  - opencv
+  - colour
+  - scipy
