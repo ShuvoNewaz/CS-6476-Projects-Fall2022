@@ -31,7 +31,7 @@
 - +20 pts: `part1_projection_matrix.py`
 - +25 pts: `part2_fundamental_matrix.py`
 - +25 pts: `part3_ransac.py`
-- +5 pts: `part4_panorama_stitching.py`
+- +5 pts: `part6_panorama_stitching.py`
 - +25 pts: Report
 - -5*n pts: Lose 5 points for every time you do not follow the instructions for the hand-in format
 
