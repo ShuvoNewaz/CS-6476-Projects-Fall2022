@@ -8,7 +8,7 @@
 
 ## Logistics
 - Submit via [Gradescope](https://gradescope.com).
-- Part 5 (panorama stitching) of this project is **optional** (extra credit) for 4476 and **required** for 6476.
+- Part 6 (panorama stitching) of this project is **optional** (extra credit) for 4476 and **required** for 6476.
 - Additional information can be found in `docs/project-3.pdf`.
 
 ## Important Notes
@@ -42,7 +42,7 @@ This is very important as you will lose 5 points for every time you do not follo
 1. Generate the zip folder (`<your_gt_username>.zip`) for the code portion of your submission once you've finished the project using `python zip_submission.py --gt_username <your_gt_username>`. It should contain:
     - `src/`: directory containing all your code for this assignment
     - `setup.cfg`: setup file for environment, do not need to change this file
-    - `additional_data/`: (required for 6476, optional for 4476) the images you used for Part 5, and/or if you use any data other than the images we provide, please include them here
+    - `additional_data/`: (required for 6476, optional for 4476) the images you used for Part 6, and/or if you use any data other than the images we provide, please include them here
 2. `<your_gt_username>_proj3.pdf` - your report
 
 ## FAQ
