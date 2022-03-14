@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# model files
+*.pt
+
+# zipped files
+*.zip

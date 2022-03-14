@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from vision.dl_utils import compute_accuracy, compute_loss
+from vision.dl_utils import compute_accuracy, compute_loss, compute_multilabel_accuracy
 
 
 class SampleModel(nn.Module):
@@ -17,6 +17,23 @@ class SampleModel(nn.Module):
 
     def forward(self, x):
         return self.net(x)
+
+
+class MultiLabelSampleModel(nn.Module):
+    def __init__(self):
+        super(MultiLabelSampleModel, self).__init__()
+        self.net = nn.Linear(5, 5, bias=False)
+
+        self.net.weight = nn.Parameter(
+            torch.arange(25, dtype=torch.float32).reshape(5, 5) - 12
+        )
+
+        self.activation = nn.Sigmoid()
+
+        self.loss_criterion = nn.BCELoss(reduction="sum")
+
+    def forward(self, x):
+        return self.activation(self.net(x))
 
 
 def test_compute_accuracy():
@@ -57,3 +74,28 @@ def test_compute_loss():
         torch.FloatTensor([9.500075340270996]),
         atol=1e-3,
     )
+
+def test_compute_multilabel_accuracy():
+    """
+    Test the label prediction logic on a dummy net
+    """
+
+    test_net = SampleModel()
+
+    x = torch.FloatTensor(
+        [
+            [1.4, -1.4, -0.7, 2.3, 0.3],
+            [0.3, 100.4, -1.4, -3.7, 2.1],
+            [2.3, 0.3, 1.4, -1.4, -5],
+        ]
+    )
+    logits = test_net(x)
+    accuracy = compute_multilabel_accuracy(
+        logits, 
+        torch.LongTensor(
+            [[0, 0, 1, 1, 1], 
+             [0, 0, 0, 1, 0], 
+             [1, 0, 0, 0, 0]]
+        )
+    )
+    assert np.isclose(accuracy, 0.93333, atol=1e-2)

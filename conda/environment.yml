@@ -15,6 +15,7 @@ dependencies:
     - pytorch-cpu
     - torchvision-cpu=0.2
     - pillow=6.2.1
+    - pandas
     - opencv
     - colour
     - scipy

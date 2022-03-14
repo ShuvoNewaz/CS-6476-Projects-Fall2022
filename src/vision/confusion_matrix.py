@@ -102,7 +102,7 @@ def generate_confusion_matrix(
             "`generate_confusion_matrix` function in "
             + "`confusion_matrix.py` needs to be implemented"
         )
-
+        
         ##########################################################################
         # Student code ends here
         ##########################################################################
@@ -238,3 +238,170 @@ def get_pred_images_for_target(
     ]
     model.train()
     return valid_image_paths
+
+
+def generate_accuracy_data(
+    model: nn.Module,
+    dataset: ImageLoader,
+    num_attributes: int,
+    use_cuda: bool = False,
+) -> Tuple[Sequence[int], Sequence[int], Sequence[str]]:
+    """
+    Get the accuracy on the val/train dataset
+
+    Args:
+    -   model: Model to generate accuracy table data for
+    -   dataset: The ImageLoader dataset that corresponds to training or val data
+    -   num_attributes: number of attributes to predict per image = k
+    -   use_cuda: Whether to evaluate on CPU or GPU
+
+    Returns:
+    -   targets: a numpy array of shape (N, k) containing the target labels
+    -   preds: a numpy array of shape (N, k) containing the predicted labels
+    """
+
+    batch_size = 32
+    cuda = use_cuda and torch.cuda.is_available()
+    dataloader_args = {"num_workers": 1, "pin_memory": True} if cuda else {}
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, **dataloader_args)
+
+    preds = np.zeros((len(dataset), num_attributes)).astype(np.int32)
+    targets = np.zeros((len(dataset), num_attributes)).astype(np.int32)
+    # label_to_idx = dataset.get_classes()
+    # class_labels = [""] * len(label_to_idx)
+
+    model.eval()
+    ##########################################################################
+    # Student code begins here
+    ##########################################################################
+
+    raise NotImplementedError(
+            "`generate_accuracy_data` function in "
+            + "`confusion_matrix.py` needs to be implemented"
+        )
+
+    ##########################################################################
+    # Student code ends here
+    ##########################################################################
+    model.train()
+
+    return targets.cpu().numpy(), preds.cpu().numpy()
+
+
+def generate_accuracy_table(
+    targets: np.ndarray, preds: np.ndarray, num_attributes: int
+) -> np.ndarray:
+    """Generate the actual accuracy table values
+
+    The accuracy table is a (num_attributes, ) array that shows the
+    number of classifications made to a predicted attribute, given a ground truth 
+    label of attributes
+
+    
+    If the classifications are:
+        ground_truths: [[1, 0, 1],
+                        [0, 0, 1],
+                        [1, 0, 0]]
+        predicted:     [[0, 0, 1],
+                        [0, 1, 1],
+                        [1, 0, 1]]
+
+    Then the accuracy table is:
+        [0.67 0.67 0.67]
+
+    Args:
+    -   targets: a numpy array of shape (N, k) containing the targets attributes
+    -   preds: a numpy array of shape (N, k) containing the predicted attributes
+    -   num_attributes: Number of attributes in the accuracy table
+    Returns:
+    -   accuracy_table: a (num_attributes, ) numpy array
+                          representing the accuracy table
+    """
+
+    accuracy_table = np.zeros(num_attributes)
+
+    ##########################################################################
+    # Student code begins here
+    ##########################################################################
+
+    raise NotImplementedError(
+            "`generate_accuracy_table` function in "
+            + "`confusion_matrix.py` needs to be implemented"
+        )
+
+    ##########################################################################
+    # Student code ends here
+    ##########################################################################
+
+    return accuracy_table
+
+
+def plot_accuracy_table(
+    accuracy_table: np.ndarray, attribute_labels: Sequence[str]
+) -> None:
+    """Plots the accuracy table
+
+    Args:
+    -   accuracy table: a (num_attributes, ) numpy array
+                          representing the accuracy table
+    -   attribute_labels: A list containing the attribute labels
+                        The length of attribute_labels should be num_attributes
+    """
+    fig, ax = plt.subplots()
+    fig.set_figheight(10)
+    fig.set_figwidth(10)
+
+    num_att = len(attribute_labels)
+
+    ax.imshow(accuracy_table[np.newaxis, :], cmap="Blues")
+
+    ax.set_xticks(np.arange(num_att))
+    ax.set_xticklabels(attribute_labels)
+
+    ax.set_xlabel("Attributes")
+    ax.set_ylabel("Accuracy")
+    ax.set_title("Accuracy Table")
+
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+
+    for i in range(num_att):
+        _ = ax.text(
+            i,
+            0,
+            f"{accuracy_table[i]:.2f}",
+            ha="center",
+            va="center",
+            color="black",
+        )
+
+    plt.show()
+
+
+def generate_and_plot_accuracy_table(
+    model: nn.Module, 
+    dataset: ImageLoader, 
+    num_attributes = int, 
+    attribute_labels = Sequence[str],
+    use_cuda: bool = False
+) -> None:
+    """Runs the entire accuracy table pipeline for convenience
+
+    Args:
+    -   model: Model to generate confusion matrix data for
+    -   dataset: The ImageLoader dataset that corresponds to training or validation data
+    -   num_attributes: Number of attributes in the accuracy table
+    -   attribute_labels: list of attribute names
+    -   use_cuda: Whether to evaluate on CPU or GPU
+    """
+
+    targets, predictions = generate_accuracy_data(
+        model, dataset, num_attributes, use_cuda=use_cuda
+    )
+
+    accuracy_table = generate_accuracy_table(
+        np.array(targets, dtype=np.int32),
+        np.array(predictions, np.int32),
+        num_attributes
+    )
+
+    plot_accuracy_table(accuracy_table, attribute_labels)

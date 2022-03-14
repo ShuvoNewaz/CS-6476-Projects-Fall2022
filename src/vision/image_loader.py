@@ -10,6 +10,8 @@ import torch
 import torch.utils.data as data
 import torchvision
 from PIL import Image
+import csv
+import pandas as pd
 
 
 class ImageLoader(data.Dataset):
@@ -64,6 +66,7 @@ class ImageLoader(data.Dataset):
             "`load_imagepaths_with_labels` function in "
             + "`image_loader.py` needs to be implemented"
         )
+
 
         ############################################################################
         # Student code end
@@ -178,7 +181,152 @@ class ImageLoader(data.Dataset):
             "`__len__` function in "
             + "`image_loader.py` needs to be implemented"
         )
+        ############################################################################
+        # Student code end
+        ############################################################################
+        return l
 
+
+class MultiLabelImageLoader(data.Dataset):
+    """Class for data loading"""
+
+    train_folder = "train"
+    test_folder = "test"
+
+    def __init__(
+        self,
+        root_dir: str,
+        labels_csv: str,
+        split: str = "train",
+        transform: torchvision.transforms.Compose = None,
+    ):
+        """Initialize the dataloader and set `curr_folder` for the corresponding data split.
+
+        Args:
+            root_dir: the dir path which contains the train and test folder
+            labels_csv: the path to the csv file containing ground truth labels
+            split: 'test' or 'train' split
+            transform: the composed transforms to be applied to the data
+        """
+        self.root = os.path.expanduser(root_dir)
+        self.labels_csv = labels_csv
+        self.transform = transform
+        self.split = split
+
+        if split == "train":
+            self.curr_folder = os.path.join(root_dir, self.train_folder)
+        elif split == "test":
+            self.curr_folder = os.path.join(root_dir, self.test_folder)
+
+        self.dataset = self.load_imagepaths_with_labels()
+
+    def load_imagepaths_with_labels(self) -> List[Tuple[str, torch.Tensor]]:
+        """Fetches all (image path,labels) pairs in the dataset from csv file. Ensure that only
+        the images from the classes in ['coast', 'highway', 'mountain', 'opencountry', 'street']
+        are included. 
+
+        NOTE: Be mindful of the returned labels type
+
+        Returns:
+            list[(filepath, list(int))]: a list of filepaths and their labels
+        """
+
+        img_paths = []  # a list of (filename, class index)
+
+        ############################################################################
+        # Student code begin
+        ############################################################################
+
+        raise NotImplementedError(
+            "`load_imagepaths_with_labels` function in "
+            + "`image_loader.py` needs to be implemented"
+        )
+
+        ############################################################################
+        # Student code end
+        ############################################################################
+
+        return img_paths
+
+
+    def load_img_from_path(self, path: str) -> Image:
+        """Loads an image as grayscale (using Pillow).
+
+        Note: do not normalize the image to [0,1]
+
+        Args:
+            path: the file path to where the image is located on disk
+        Returns:
+            image: grayscale image with values in [0,255] loaded using pillow
+                Note: Use 'L' flag while converting using Pillow's function.
+        """
+
+        img = None
+        ############################################################################
+        # Student code begin
+        ############################################################################
+
+        raise NotImplementedError(
+            "`load_img_from_path` function in "
+            + "`image_loader.py` needs to be implemented"
+        )
+
+
+        ############################################################################
+        # Student code end
+        ############################################################################
+        return img
+
+    def __getitem__(self, index: int) -> Tuple[torch.Tensor, int]:
+        """Fetches the item (image, label) at a given index.
+
+        Note: Do not forget to apply the transforms, if they exist
+
+        Hint:
+        1) get info from self.dataset
+        2) use load_img_from_path
+        3) apply transforms if valid
+
+        Args:
+            index: Index
+        Returns:
+            img: image of shape (H,W)
+            class_idx: index of the ground truth class for this image
+        """
+        img = None
+        class_idx = None
+
+        ############################################################################
+        # Student code start
+        ############################################################################
+
+        raise NotImplementedError(
+            "`__getitem__` function in "
+            + "`image_loader.py` needs to be implemented"
+        )
+
+        ############################################################################
+        # Student code end
+        ############################################################################
+        return img, class_idx
+
+    def __len__(self) -> int:
+        """Returns the number of items in the dataset.
+
+        Returns:
+            l: length of the dataset
+        """
+
+        l = 0
+
+        ############################################################################
+        # Student code start
+        ############################################################################
+
+        raise NotImplementedError(
+            "`__len__` function in "
+            + "`image_loader.py` needs to be implemented"
+        )
         ############################################################################
         # Student code end
         ############################################################################

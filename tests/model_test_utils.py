@@ -9,6 +9,7 @@ import torch.nn as nn
 from vision.my_resnet import MyResNet18
 from vision.simple_net import SimpleNet
 from vision.simple_net_final import SimpleNetFinal
+from vision.multilabel_resnet import MultilabelResNet18
 
 
 def flatten_layers(layers):
@@ -34,7 +35,7 @@ def flatten_layers(layers):
     return flattened_layers
 
 
-def extract_model_layers(model: Union[SimpleNet, SimpleNetFinal, MyResNet18]):
+def extract_model_layers(model: Union[SimpleNet, SimpleNetFinal, MyResNet18, MultilabelResNet18]):
     # get the CNN sequential
     layers = flatten_layers(
         list(model.conv_layers.children())
@@ -75,3 +76,6 @@ if __name__ == "__main__":
 
     model3 = MyResNet18()
     print(extract_model_layers(model3))
+
+    model4 = MultilabelResNet18()
+    print(extract_model_layers(model4))

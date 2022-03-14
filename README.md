@@ -1,14 +1,20 @@
-# Project 4: Recognition with Deep Learning
+# Project 4: Image Recognition with Deep Learning
+
+## Important
+
+-   Submit via [Gradescope](https://gradescope.com).
+-   Part 4 (Multi-label Scene Attribute Prediction) of this project is **optional** (extra credit) for 4476 and **required** for 6476.
+-   Additional information can be found in `docs/project-4.pdf`.
 
 ## Setup Overview
 
 In the following setup, you will learn how to:
 
-- **Generate** a template repository
-- **Clone** your repository
-- **Build** your environment
-- **Run** the unit tests
-- **Submit** assignment to gradescope
+-   **Generate** a template repository
+-   **Clone** your repository
+-   **Build** your conda environment
+-   **Run** the unit tests
+-   **Submit** assignment to gradescope
 
 ---
 
@@ -18,11 +24,11 @@ In the following setup, you will learn how to:
 
 Read about [Template Repositories](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-on-github/creating-a-template-repository).
 
-- Click [here](https://github.gatech.edu/cs4476/project-4/generate) or the *Use this template* button at the top right of the repository.
-- Name your repository `project-4` and ensure (these are **required!**):
-  - You are the **owner**.
-  - The repository is **private**.
-  
+-   Click [here](https://github.gatech.edu/cs4476/project-4/generate) or the _Use this template_ button at the top right of the repository.
+-   Name your repository `project-4` and ensure (these are **required!**):
+    -   You are the **owner**.
+    -   The repository is **private**.
+
 ### Clone your repository
 
 From the VSCode terminal, traverse to the directory where you store your code. Enter the following:
@@ -31,16 +37,10 @@ From the VSCode terminal, traverse to the directory where you store your code. E
 gh repo clone github.gatech.edu/[YOUR_USERNAME]/project-4
 ```
 
-### Build your environment
+### Build your conda environment
 
-Read about [Devcontainers](https://code.visualstudio.com/docs/remote/containers#_quick-start-open-an-existing-folder-in-a-container).
-
-- From terminal, navigate to the root directory of this project `project-4`.
-- In your terminal, type `code .`
-- You should see a new VSCode instance launch and a prompt in the bottom right corner with a button that says **Reopen in Container**. Click it.
-- Your Docker image should start image and you should be good to go after the build process is over!
-
-**NOTE:** You may need to reload VSCode for the `python` extension to finish installing. Verify that the `python` extension does not need to be reloaded in the *extensions* tab.
+-   See [Project 0](https://github.gatech.edu/cs4476/project-0) for detailed environment setup.
+-   Ensure that you are using the environment cv_proj4, which you can install using the install script conda/install.sh.
 
 ### Run the unit tests
 
@@ -55,6 +55,7 @@ pytest tests
 ### Submitting assignment to gradescope
 
 To create the zip file to upload on gradescope, run
+
 ```
 python submission.py --gt_username your_username
 ```

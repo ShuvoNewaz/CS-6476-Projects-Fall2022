@@ -2,7 +2,7 @@ import os
 import shutil
 import yaml
 
-FILE_SIZE_LIMIT = 15000000
+FILE_SIZE_LIMIT = 60000000
 OUT_FILENAME = "cv_proj4"
 FILE_LIST_YAML = ".colab_zip_dir_list.yml"
 

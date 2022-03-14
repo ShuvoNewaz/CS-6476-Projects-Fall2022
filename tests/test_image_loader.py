@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from vision.data_transforms import get_fundamental_transforms
-from vision.image_loader import ImageLoader
+from vision.image_loader import ImageLoader, MultiLabelImageLoader
 
 PROJ_ROOT = Path(__file__).resolve().parent.parent
 
@@ -74,6 +74,39 @@ def test_load_img_from_path():
     expected_data = np.loadtxt(f"{PROJ_ROOT}/tests/data/sample_inp.txt")
 
     assert np.allclose(expected_data, im_np)
+
+
+def test_multilabel_dataset_length():
+    train_image_loader = MultiLabelImageLoader(
+        root_dir=f"{PROJ_ROOT}/data/",
+        labels_csv=f"{PROJ_ROOT}/scene_attributes_train.csv",
+        split="train",
+        transform=get_fundamental_transforms(inp_size=(64, 64)),
+    )
+
+    test_image_loader = MultiLabelImageLoader(
+        root_dir=f"{PROJ_ROOT}/data/",
+        labels_csv=f"{PROJ_ROOT}/scene_attributes_test.csv",
+        split="test",
+        transform=get_fundamental_transforms(inp_size=(64, 64)),
+    )
+
+    assert train_image_loader.__len__() == 1196
+    assert test_image_loader.__len__() == 500
+
+
+def test_multilabel_unique_vals():
+    train_image_loader = MultiLabelImageLoader(
+        root_dir=f"{PROJ_ROOT}/data/",
+        labels_csv=f"{PROJ_ROOT}/scene_attributes_train.csv",
+        split="train",
+        transform=get_fundamental_transforms(inp_size=(64, 64)),
+    )
+
+    item1 = train_image_loader.__getitem__(17)
+    item2 = train_image_loader.__getitem__(30)
+
+    assert not torch.allclose(item1[0], item2[0])
 
 
 if __name__ == "__main__":
