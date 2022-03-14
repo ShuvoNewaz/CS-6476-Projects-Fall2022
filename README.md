@@ -3,7 +3,7 @@
 ## Important
 
 -   Submit via [Gradescope](https://gradescope.com).
--   Part 4 (Multi-label Scene Attribute Prediction) of this project is **optional** (extra credit) for 4476 and **required** for 6476.
+-   Part 4 (Multi-label Scene Attributes Prediction) of this project is **optional** (extra credit) for 4476 and **required** for 6476.
 -   Additional information can be found in `docs/project-4.pdf`.
 
 ## Setup Overview
