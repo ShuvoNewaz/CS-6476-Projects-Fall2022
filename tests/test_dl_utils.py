@@ -80,7 +80,7 @@ def test_compute_multilabel_accuracy():
     Test the label prediction logic on a dummy net
     """
 
-    test_net = SampleModel()
+    test_net = MultiLabelSampleModel()
 
     x = torch.FloatTensor(
         [
