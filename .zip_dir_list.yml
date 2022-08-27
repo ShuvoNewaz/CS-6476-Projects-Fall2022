@@ -1,0 +1,9 @@
+required_directories:
+  - src
+required_files:
+  - cutoff_frequencies.txt
+  - setup.cfg
+optional_directories:
+  - additional_data
+optional_files:
+  - README.txt
