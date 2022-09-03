@@ -16,7 +16,7 @@ class HybridImageModel(nn.Module):
         """
         Initializes an instance of the HybridImageModel class.
         """
-        super(HybridImageModel, self).__init__()
+        super().__init__()
 
     def get_kernel(self, cutoff_frequency: int) -> torch.Tensor:
         """
@@ -50,9 +50,16 @@ class HybridImageModel(nn.Module):
         ############################
         ### TODO: YOUR CODE HERE ###
 
-        raise NotImplementedError(
-            "`get_kernel` function in `part2_models.py` needs to be implemented"
-        )
+        kernel = create_Gaussian_kernel_2D(cutoff_frequency)
+        k = len(kernel)
+        kernel = kernel.reshape(1, k, k)
+        kernel = np.tile(kernel, (self.n_channels, 1, 1, 1))
+        kernel = torch.tensor(kernel, dtype=torch.float32)
+
+
+        # raise NotImplementedError(
+        #     "`get_kernel` function in `part2_models.py` needs to be implemented"
+        # )
 
         ### END OF STUDENT CODE ####
         ############################
@@ -81,9 +88,13 @@ class HybridImageModel(nn.Module):
         ############################
         ### TODO: YOUR CODE HERE ###
 
-        raise NotImplementedError(
-            "`low_pass` function in `part2_models.py` needs to be implemented"
-        )
+        k = kernel.size(dim=2)
+        padding = (k - 1) // 2
+        filtered_image = F.conv2d(x, kernel, padding=padding, groups=self.n_channels)
+
+        # raise NotImplementedError(
+        #     "`low_pass` function in `part2_models.py` needs to be implemented"
+        # )
 
         ### END OF STUDENT CODE ####
         ############################
@@ -123,9 +134,16 @@ class HybridImageModel(nn.Module):
         ############################
         ### TODO: YOUR CODE HERE ###
 
-        raise NotImplementedError(
-            "`forward` function in `part2_models.py` needs to be implemented"
-        )
+        cutoff_frequency = int(cutoff_frequency.numpy()[0]) # Can't be non-integer?
+        kernel = self.get_kernel(cutoff_frequency)
+        low_frequencies = self.low_pass(image1, kernel)
+        high_frequencies = image2 - self.low_pass(image2, kernel)
+        hybrid_image = torch.add(low_frequencies, high_frequencies)
+        hybrid_image = torch.clamp(hybrid_image, min=0, max=1)
+
+        # raise NotImplementedError(
+        #     "`forward` function in `part2_models.py` needs to be implemented"
+        # )
 
         ### END OF STUDENT CODE ####
         ############################

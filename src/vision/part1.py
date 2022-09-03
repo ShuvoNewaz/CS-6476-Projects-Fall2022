@@ -26,9 +26,20 @@ def create_Gaussian_kernel_1D(ksize: int, sigma: int) -> np.ndarray:
     - The goal is to discretize a 1d continuous distribution onto a vector.
     """
 
-    raise NotImplementedError(
-        "`create_Gaussian_kernel_1D` function in `part1.py` needs to be implemented"
-    )
+    ############################
+    ### TODO: YOUR CODE HERE ###
+
+    mu = ksize // 2
+    x = np.linspace(0, ksize-1, ksize)[:, np.newaxis]
+    kernel = np.exp(-1 / (2 * sigma**2) * (x - mu)**2)
+    kernel = kernel / kernel.sum()
+
+    # raise NotImplementedError(
+    #     "`create_Gaussian_kernel_1D` function in `part1.py` needs to be implemented"
+    # )
+
+    ### END OF STUDENT CODE ####
+    ############################
 
     return kernel
 
@@ -63,9 +74,13 @@ def create_Gaussian_kernel_2D(cutoff_frequency: int) -> np.ndarray:
     ############################
     ### TODO: YOUR CODE HERE ###
 
-    raise NotImplementedError(
-        "`create_Gaussian_kernel_2D` function in `part1.py` needs to be implemented"
-    )
+    k = cutoff_frequency * 4 + 1
+    kernel = create_Gaussian_kernel_1D(k, cutoff_frequency)
+    kernel = kernel @ kernel.T
+
+    # raise NotImplementedError(
+    #     "`create_Gaussian_kernel_2D` function in `part1.py` needs to be implemented"
+    # )
 
     ### END OF STUDENT CODE ####
     ############################
@@ -106,9 +121,23 @@ def my_conv2d_numpy(image: np.ndarray, filter: np.ndarray) -> np.ndarray:
     ############################
     ### TODO: YOUR CODE HERE ###
 
-    raise NotImplementedError(
-        "`my_conv2d_numpy` function in `part1.py` needs to be implemented"
-    )
+    m, n, c = image.shape
+    k, j = filter.shape
+    row_padding, col_padding = (k - 1) // 2, (j - 1) // 2
+    m_pad, n_pad = m + 2*row_padding, n + 2*col_padding
+    padded_image = np.zeros((m_pad, n_pad, c))
+    padded_image[row_padding:m_pad-row_padding, col_padding:n_pad-col_padding, :] = image
+    filtered_image = np.zeros((m_pad, n_pad, c))
+
+    for channel in range(c):
+      for h in range(m):
+        for w in range(n):
+          filtered_image[h, w, channel] = (filter * padded_image[h:h+k, w:w+j, channel]).sum()
+    filtered_image = filtered_image[:m_pad-2*row_padding, :n_pad-2*col_padding, :]
+          
+    # raise NotImplementedError(
+    #     "`my_conv2d_numpy` function in `part1.py` needs to be implemented"
+    # )
 
     ### END OF STUDENT CODE ####
     ############################
@@ -154,9 +183,13 @@ def create_hybrid_image(
     ############################
     ### TODO: YOUR CODE HERE ###
 
-    raise NotImplementedError(
-        "`create_hybrid_image` function in `part1.py` needs to be implemented"
-    )
+    low_frequencies = my_conv2d_numpy(image1, filter)
+    high_frequencies = image2 - my_conv2d_numpy(image2, filter)
+    hybrid_image = np.clip(low_frequencies + high_frequencies, 0, 1)
+
+    # raise NotImplementedError(
+    #     "`create_hybrid_image` function in `part1.py` needs to be implemented"
+    # )
 
     ### END OF STUDENT CODE ####
     ############################

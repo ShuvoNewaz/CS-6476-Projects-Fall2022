@@ -36,9 +36,26 @@ def make_dataset(path: str) -> Tuple[List[str], List[str]]:
     ############################
     ### TODO: YOUR CODE HERE ###
 
-    raise NotImplementedError(
-        "`make_dataset` function in `part2_datasets.py` needs to be implemented"
-    )
+    images_a, images_b = [], []
+    filenames = os.listdir(path)
+    filenames.sort()
+    for filename in filenames:
+        try:
+            int(filename[0])
+        except:
+            continue
+        for i, char in enumerate(filename):
+            if char == '_':
+                if filename[i - 1] == 'a':
+                    images_a.append(os.path.join(path, filename))
+                elif filename[i - 1] == 'b':
+                    images_b.append(os.path.join(path, filename))
+                break
+
+
+    # raise NotImplementedError(
+    #     "`make_dataset` function in `part2_datasets.py` needs to be implemented"
+    # )
 
     ### END OF STUDENT CODE ####
     ############################
@@ -64,10 +81,16 @@ def get_cutoff_frequencies(path: str) -> List[int]:
     ############################
     ### TODO: YOUR CODE HERE ###
 
-    raise NotImplementedError(
-        "`get_cutoff_frequencies` function in "
-        + "`part2_datasets.py` needs to be implemented"
-    )
+    cutoff_frequencies = []
+    with open(path) as f:
+        for frequency in f:
+            cutoff_frequencies.append(int(frequency))
+    cutoff_frequencies = np.array(cutoff_frequencies)
+
+    # raise NotImplementedError(
+    #     "`get_cutoff_frequencies` function in "
+    #     + "`part2_datasets.py` needs to be implemented"
+    # )
 
     ### END OF STUDENT CODE ####
     ############################
@@ -95,14 +118,14 @@ class HybridImageDataset(data.Dataset):
         """
         images_a, images_b = make_dataset(image_dir)
         cutoff_frequencies = get_cutoff_frequencies(cf_file)
-
-        self.transform = None
+        self.transform = transforms.Compose([transforms.ToTensor()])
+        
         ############################
         ### TODO: YOUR CODE HERE ###
 
-        raise NotImplementedError(
-            "`self.transform` function in `part2_datasets.py` needs to be implemented"
-        )
+        # raise NotImplementedError(
+        #     "`self.transform` function in `part2_datasets.py` needs to be implemented"
+        # )
 
         ### END OF STUDENT CODE ####
         ############################
@@ -117,9 +140,11 @@ class HybridImageDataset(data.Dataset):
         ############################
         ### TODO: YOUR CODE HERE ###
 
-        raise NotImplementedError(
-            "`__len__` function in `part2_datasets.py` needs to be implemented"
-        )
+        # raise NotImplementedError(
+        #     "`__len__` function in `part2_datasets.py` needs to be implemented"
+        # )
+
+        return len(self.images_a)
 
         ### END OF STUDENT CODE ####
         ############################
@@ -151,9 +176,14 @@ class HybridImageDataset(data.Dataset):
         ############################
         ### TODO: YOUR CODE HERE ###
 
-        raise NotImplementedError(
-            "`__getitem__ function in `part2_datasets.py` needs to be implemented"
-        )
+        image_a_dir, image_b_dir = self.images_a[idx], self.images_b[idx]
+        cutoff_frequency = self.cutoff_frequencies[idx]
+        image_a = self.transform(PIL.Image.open(image_a_dir))
+        image_b = self.transform(PIL.Image.open(image_b_dir))
+
+        # raise NotImplementedError(
+        #     "`__getitem__ function in `part2_datasets.py` needs to be implemented"
+        # )
 
         ### END OF STUDENT CODE ####
         ############################
