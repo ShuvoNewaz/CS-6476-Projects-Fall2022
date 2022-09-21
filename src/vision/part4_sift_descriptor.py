@@ -51,9 +51,7 @@ def get_magnitudes_and_orientations(
 
     magnitudes = np.sqrt(Ix ** 2 + Iy ** 2)
     orientations = np.arctan2(Iy, Ix)
-    # orientations[orientations < 0] = orientations[orientations < 0] + np.pi
-    # orientations[orientations > np.pi] = orientations[orientations > np.pi] - np.pi
-
+    
     # raise NotImplementedError('`get_magnitudes_and_orientations()` function ' +
     #     'in `part4_sift_descriptor.py` needs to be implemented')
 
