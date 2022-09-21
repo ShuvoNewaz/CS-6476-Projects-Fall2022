@@ -29,8 +29,21 @@ def compute_normalized_patch_descriptors(
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError('`compute_normalized_patch_descriptors` ' +
-        'function in`part2_patch_descriptor.py` needs to be implemented')
+    fvs = np.zeros((len(X), feature_width ** 2))
+    padded_image = np.pad(image_bw, feature_width // 2, 'constant', constant_values=(0,))
+    new_X, new_Y = Y + feature_width // 2, X + feature_width // 2
+
+    for count, (i, j) in enumerate(zip(new_X, new_Y)):
+        if feature_width % 2 == 0:
+            start_i, start_j = i - (feature_width // 2 - 1), j - (feature_width // 2 - 1)
+        else:
+            start_i, start_j = i - feature_width // 2 , j - feature_width // 2
+        image_patch = padded_image[start_i:start_i+feature_width, start_j:start_j+feature_width]
+        image_norm = image_patch / np.linalg.norm(image_patch)
+        fvs[count] = image_norm.ravel()
+
+    # raise NotImplementedError('`compute_normalized_patch_descriptors` ' +
+    #     'function in`part2_patch_descriptor.py` needs to be implemented')
 
     ###########################################################################
     #                             END OF YOUR CODE                            #

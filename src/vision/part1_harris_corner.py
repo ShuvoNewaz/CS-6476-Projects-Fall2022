@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from types import coroutine
 import numpy as np
 import torch
 
@@ -21,6 +22,19 @@ SOBEL_Y_KERNEL = np.array(
     ]).astype(np.float32)
 
 
+def my_conv2d(image: np.ndarray, filter: np.ndarray) -> np.ndarray:
+    k, j = filter.shape
+    image_tensor = torch.from_numpy(image).unsqueeze(0)
+    filter_tensor = torch.from_numpy(filter).unsqueeze(0)
+    conv2d = torch.nn.Conv2d(1, 1, k, stride=1, padding=(k-1)//2, bias=False)
+    conv2d.weight.requires_grad = False
+    conv2d.weight[0] = nn.Parameter(filter_tensor)
+    filtered_image = conv2d(image_tensor).squeeze(0)
+    filtered_image = filtered_image.detach().numpy()
+
+    return filtered_image
+
+
 def compute_image_gradients(image_bw: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """Use convolution with Sobel filters to compute the image gradient at each
     pixel.
@@ -39,8 +53,11 @@ def compute_image_gradients(image_bw: np.ndarray) -> Tuple[np.ndarray, np.ndarra
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
     
-    raise NotImplementedError('`compute_image_gradients` function in ' +
-        '`part1_harris_corner.py` needs to be implemented')
+    Ix = my_conv2d(image_bw, SOBEL_X_KERNEL)
+    Iy = my_conv2d(image_bw, SOBEL_Y_KERNEL)
+
+    # raise NotImplementedError('`compute_image_gradients` function in ' +
+    #     '`part1_harris_corner.py` needs to be implemented')
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -170,8 +187,16 @@ def compute_harris_response_map(
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError('`compute_harris_response_map` function in ' +
-        '`part1_harris_corner.py` needs to be implemented')
+    S_xx, S_yy, S_xy = second_moments(image_bw=image_bw, ksize=ksize, sigma=sigma)
+    M, N = image_bw.shape
+    S_xx, S_yy, S_xy = S_xx.ravel(), S_yy.ravel(), S_xy.ravel()
+    det_M = S_xx * S_yy - S_xy**2
+    trace_M = S_xx + S_yy
+    R = det_M - alpha * trace_M ** 2
+    R = R.reshape(M, N)
+    
+    # raise NotImplementedError('`compute_harris_response_map` function in ' +
+    #     '`part1_harris_corner.py` needs to be implemented')
 
     ###########################################################################
     #                           END OF YOUR CODE                              #
@@ -246,8 +271,19 @@ def nms_maxpool_pytorch(
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError('`compute_harris_response_map` function in ' +
-        '`part1_harris_corner.py` needs to be implemented')
+    median = np.median(R)
+    R[R < median] = 0
+
+    R = torch.from_numpy(R)
+    padding = ksize // 2
+    R = R.unsqueeze(0)
+    maxpool = nn.MaxPool2d(ksize, stride=1, padding=padding)
+    maxpooled_R = maxpool(R).squeeze()
+    binarized_R = torch.where(maxpooled_R == R, R, 0).squeeze().detach().numpy()
+
+    ind = np.unravel_index(np.argsort(binarized_R, axis=None), binarized_R.shape) # gets the indices of the R-values in ascending order
+    y, x = np.flip(ind[0])[:k], np.flip(ind[1])[:k]
+    confidences = binarized_R[y, x]
 
     ###########################################################################
     #                           END OF YOUR CODE                              #
@@ -314,8 +350,13 @@ def get_harris_interest_points(
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError('`get_harris_interest_points` function in ' +
-        '`part1_harris_corner.py` needs to be implemented')
+    R = compute_harris_response_map(image_bw=image_bw)
+    R = R / R.max()
+    x, y, c = nms_maxpool_pytorch(R=R, k=k, ksize=7)
+    x, y, c = remove_border_vals(image_bw, x, y, c)
+
+    # raise NotImplementedError('`get_harris_interest_points` function in ' +
+    #     '`part1_harris_corner.py` needs to be implemented')
 
     ###########################################################################
     #                           END OF YOUR CODE                              #

@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import dis
 import numpy as np
 
 from typing import Tuple
@@ -35,9 +36,15 @@ def compute_feature_distances(
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
+    
+    features1_euclidean = np.sum(features1 ** 2, axis=1, keepdims=True)
+    features2t = features2.T
+    features2_euclidean = np.sum(features2t ** 2, axis=0, keepdims=True)
+    dist2 = np.abs(features1_euclidean + features2_euclidean - 2.0 * features1 @ features2t)
+    dists = np.sqrt(dist2)
 
-    raise NotImplementedError('`compute_feature_distances` function in ' +
-        '`part3_feature_matching.py` needs to be implemented')
+    # raise NotImplementedError('`compute_feature_distances` function in ' +
+    #     '`part3_feature_matching.py` needs to be implemented')
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -82,9 +89,24 @@ def match_features_ratio_test(
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
+    
+    threshold = 0.8275
+    dists = compute_feature_distances(features1, features2)
+    sorted_dists = np.sort(dists, axis=1)
+    sorted_dist_ind = np.argsort(dists, axis=1)
+    NNDR = sorted_dists[:, 0] / sorted_dists[:, 1]
+    allowed_matches_count = (NNDR <= threshold).sum()
+    confidence_ind = np.argsort(NNDR)[:allowed_matches_count]
+    if len(confidence_ind) > 0:
+        confidences = NNDR[confidence_ind]
+        matches = np.zeros((len(confidences), 2), dtype=np.int)
+        matches[:, 0] = confidence_ind
+        matches[:, 1] = sorted_dist_ind[confidence_ind, 0]
+    else:
+        confidences, matches = [], []
 
-    raise NotImplementedError('`match_features_ratio_test` function in ' +
-        '`part3_feature_matching.py` needs to be implemented')
+    # raise NotImplementedError('`match_features_ratio_test` function in ' +
+    #     '`part3_feature_matching.py` needs to be implemented')
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
