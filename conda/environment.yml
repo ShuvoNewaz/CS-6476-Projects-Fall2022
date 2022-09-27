@@ -12,8 +12,9 @@ dependencies:
   - pytest
   - python>=3.6
   - pyyaml
-  - pytorch-cpu
-  - torchvision-cpu=0.2
+  - pytorch
+  - torchvision
+  - Pillow
   - opencv
   - colour
   - scipy
