@@ -8,7 +8,7 @@ import time
 import torch
 
 from vision.part1_harris_corner import compute_image_gradients
-from torch import nn
+from torch import nn, sin
 from typing import Tuple
 
 
@@ -279,8 +279,8 @@ def AngleBasis(angles: np.array) -> np.array:
 
 
 def AngleGradLayer(gradients: np.array) -> torch.Tensor:
-    angles = torch.Tensor([np.pi/8, np.pi/4 + np.pi/8, np.pi/2 + np.pi/8, 3*np.pi/4 + np.pi/8,\
-         np.pi + np.pi/8, 5*np.pi/4 + np.pi/8, 3*np.pi/2 + np.pi/8, 7*np.pi/4 + np.pi/8])
+    angles = torch.Tensor([np.pi/8, 3*np.pi/8, 5*np.pi/8, 7*np.pi/8,\
+         9*np.pi/8, 11*np.pi/8, 13*np.pi/8, 15*np.pi/8])
     angle_vectors = torch.from_numpy(AngleBasis(angles)).to(torch.float32)
     dx = torch.Tensor([1, 0]).view(1,2)
     dy = torch.Tensor([0, 1]).view(1,2)
@@ -311,7 +311,7 @@ def HistogramLayer(angle_grad):
 
 
 def AccumulationLayer(histogram):
-    conv2d = nn.Conv2d(in_channels=8, out_channels=8, kernel_size=4, padding=(2,2), groups=8, bias=False, stride=1)
+    conv2d = nn.Conv2d(in_channels=8, out_channels=8, kernel_size=4, padding=2, groups=8, bias=False, stride=1)
     conv2d.weight.requires_grad = False
     conv2d.weight = nn.Parameter(torch.ones(8, 1, 4, 4))
 
@@ -319,8 +319,8 @@ def AccumulationLayer(histogram):
 
 
 def PatchFinder(r: int, c: int):
-    x = np.linspace(r - 7, r + 8, 4)
-    y = np.linspace(c - 7, c + 8, 4)
+    x = np.linspace(r - 7, r + 8, 16)
+    y = np.linspace(c - 7, c + 8, 16)
     x_grid, y_grid = np.meshgrid(x, y)
 
     x_grid = x_grid.ravel().astype(np.int)
@@ -383,17 +383,12 @@ def get_sift_features_vectorized(
     features = AccumulationLayer(histogram)
     
     total_features=[]
-    concat_features=[]
     for i in range(len(X)):
         x_grid, y_grid = PatchFinder(X[i], Y[i])
-        for j in range(len(x_grid)):
-            feat = features[:, :, y_grid[j], x_grid[j]]
-            concat_features.append(feat)
-        single_features = torch.cat(concat_features, dim=1)
-        single_features = nn.functional.normalize(single_features, dim=1)
-        single_features = single_features ** 0.885
-        total_features.append(single_features)
-        concat_features=[]
+        feat = features[:, :, y_grid, x_grid].view(1, 8 * len(x_grid))
+        feat = nn.functional.normalize(feat, dim=1)
+        feat = feat ** 0.65
+        total_features.append(feat)
     fvs = torch.cat(total_features, dim=0)
     fvs= fvs.detach().numpy()
 

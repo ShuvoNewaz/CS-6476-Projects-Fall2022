@@ -91,6 +91,7 @@ def match_features_ratio_test(
     ###########################################################################
     
     threshold = 0.8275
+    # threshold = 0.76
     dists = compute_feature_distances(features1, features2)
     sorted_dists = np.sort(dists, axis=1)
     sorted_dist_ind = np.argsort(dists, axis=1)
