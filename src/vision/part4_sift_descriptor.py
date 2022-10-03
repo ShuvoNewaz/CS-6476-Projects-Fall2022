@@ -303,30 +303,30 @@ def HistogramLayer(angle_grad):
     magnitude = torch.sqrt(im_grads[0] ** 2 + im_grads[1] ** 2)
     ind = torch.argmax(angles, dim=0).ravel().detach().numpy()
 
-    orientations[ind, np.arange(M*N)] = magnitude[ind]
+    orientations[ind, np.arange(M*N)] = magnitude#[ind]
     orientations = orientations.view(8, M, N)
     orientations = orientations.unsqueeze(0)
     
     return orientations
 
 
-def AccumulationLayer(histogram):
-    conv2d = nn.Conv2d(in_channels=8, out_channels=8, kernel_size=4, padding=2, groups=8, bias=False, stride=1)
-    conv2d.weight.requires_grad = False
-    conv2d.weight = nn.Parameter(torch.ones(8, 1, 4, 4))
-
-    return conv2d(histogram)
-
-
-def PatchFinder(r: int, c: int):
-    x = np.linspace(r - 7, r + 8, 16)
-    y = np.linspace(c - 7, c + 8, 16)
+def PatchFinder(r: int, c: int, feature_width=16):
+    x = np.linspace(r - 7, r + 8, feature_width)
+    y = np.linspace(c - 7, c + 8, feature_width)
     x_grid, y_grid = np.meshgrid(x, y)
 
     x_grid = x_grid.ravel().astype(np.int)
     y_grid = y_grid.ravel().astype(np.int)
 
     return x_grid, y_grid
+
+
+def AccumulationLayer(histogram):
+    conv2d = nn.Conv2d(in_channels=8, out_channels=8, kernel_size=4, padding=0, groups=8, bias=False, stride=4)
+    conv2d.weight.requires_grad = False
+    conv2d.weight = nn.Parameter(torch.ones(8, 1, 4, 4))
+
+    return conv2d(histogram)
 
 
 def get_sift_features_vectorized(
@@ -377,21 +377,21 @@ def get_sift_features_vectorized(
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
+    feature_width = 16
     gradients = ImageGradientsLayer(image_bw=image_bw)
     orientation = AngleGradLayer(gradients)
     histogram = HistogramLayer(orientation)
-    features = AccumulationLayer(histogram)
     
     total_features=[]
     for i in range(len(X)):
-        x_grid, y_grid = PatchFinder(X[i], Y[i])
-        feat = features[:, :, y_grid, x_grid].view(1, 8 * len(x_grid))
+        x_grid, y_grid = PatchFinder(X[i], Y[i], feature_width)
+        feat = histogram[:, :, y_grid, x_grid].view(1, 8, feature_width, feature_width)
+        feat = AccumulationLayer(feat).view(1, 8 * feature_width)
         feat = nn.functional.normalize(feat, dim=1)
-        feat = feat ** 0.65
+        feat = feat ** 0.5
         total_features.append(feat)
     fvs = torch.cat(total_features, dim=0)
     fvs= fvs.detach().numpy()
-
 
     # raise NotImplementedError('`get_SIFT_features_vectorized` function in ' +
     #     '`part4_sift_descriptor.py` needs to be implemented')
