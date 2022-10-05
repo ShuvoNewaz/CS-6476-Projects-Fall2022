@@ -3,7 +3,7 @@
 import numpy as np
 
 
-def normalize_points(points: np.ndarray) -> (np.ndarray, np.ndarray):
+def normalize_points(points: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
     Perform coordinate normalization through linear transformations.
     Args:
@@ -20,10 +20,21 @@ def normalize_points(points: np.ndarray) -> (np.ndarray, np.ndarray):
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError(
-        "`normalize_points` function in "
-        + "`fundamental_matrix.py` needs to be implemented"
-    )
+    N = len(points)
+    mean = np.mean(points, axis=0)[np.newaxis, :]
+    std = np.std(points, axis=0)[np.newaxis, :]
+
+    points_normalized = (points - mean) / std
+
+    A = np.concatenate((points, np.ones((N, 1))), axis=1)
+    B = np.concatenate((points_normalized, np.ones((N, 1))), axis=1)
+    T = np.linalg.inv((A.T @ A) + 1e-9) @ (A.T @ B)
+    T = T.T
+
+    # raise NotImplementedError(
+    #     "`normalize_points` function in "
+    #     + "`fundamental_matrix.py` needs to be implemented"
+    # )
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -51,10 +62,12 @@ def unnormalize_F(F_norm: np.ndarray, T_a: np.ndarray, T_b: np.ndarray) -> np.nd
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError(
-        "`unnormalize_F` function in "
-        + "`fundamental_matrix.py` needs to be implemented"
-    )
+    F_orig = (T_b.T @ F_norm) @ T_a
+
+    # raise NotImplementedError(
+    #     "`unnormalize_F` function in "
+    #     + "`fundamental_matrix.py` needs to be implemented"
+    # )
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -83,10 +96,29 @@ def estimate_fundamental_matrix(
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError(
-        "`estimate_fundamental_matrix` function in "
-        + "`fundamental_matrix.py` needs to be implemented"
-    )
+    N = len(points_a)
+    A = np.zeros((N, 8))
+    A[:, 0] = points_a[:, 0] * points_b[:, 0]
+    A[:, 1] = points_a[:, 1] * points_b[:, 0]
+    A[:, 2] = points_b[:, 0]
+    A[:, 3] = points_a[:, 0] * points_b[:, 1]
+    A[:, 4] = points_a[:, 1] * points_b[:, 1]
+    A[:, 5] = points_b[:, 1]
+    A[:, 6] = points_a[:, 0]
+    A[:, 7] = points_a[:, 1]
+
+    B = -np.ones((N, 1))
+
+    F = np.linalg.inv((A.T @ A) + 1e-9) @ (A.T @ B)
+    F = np.concatenate((F.ravel(), [1]), axis=0).reshape(3, 3)
+    U, S, VT = np.linalg.svd(F)
+    S[len(S) - 1] = 0
+    F = (U @ np.diag(S)) @ VT
+
+    # raise NotImplementedError(
+    #     "`estimate_fundamental_matrix` function in "
+    #     + "`fundamental_matrix.py` needs to be implemented"
+    # )
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
