@@ -27,10 +27,13 @@ def calculate_num_ransac_iterations(
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError(
-        "`calculate_num_ransac_iterations` function "
-        + "in `ransac.py` needs to be implemented"
-    )
+    num_samples = np.log(1 - prob_success) \
+        / np.log(1 - ind_prob_correct**sample_size)
+
+    # raise NotImplementedError(
+    #     "`calculate_num_ransac_iterations` function "
+    #     + "in `ransac.py` needs to be implemented"
+    # )
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -84,10 +87,31 @@ def ransac_fundamental_matrix(
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError(
-        "`ransac_fundamental_matrix` function in "
-        + "`ransac.py` needs to be implemented"
-    )
+    iterations = calculate_num_ransac_iterations(.99, 9, .9)
+    threshold = 1e-5
+    inlier_count = 0
+
+    N = len(matches_a)
+    matches_a = np.concatenate((matches_a, np.zeros((N, 1))), axis=1)
+    matches_b = np.concatenate((matches_b, np.zeros((N, 1))), axis=1)
+    for i in range(iterations):
+        idx = np.random.choice(len(matches_a), 9, replace=False)
+        temp_a = matches_a[idx]
+        temp_b = matches_b[idx]
+        temp_F = estimate_fundamental_matrix(temp_a, temp_b)
+        
+        a_F_b = ((matches_b @ temp_F) * matches_a).sum(axis=1)
+        inlier_ind = np.where(a_F_b <= threshold)
+        if len(inlier_ind) > inlier_count:
+            inlier_count = len(inlier_ind)
+            best_F = temp_F
+            inliers_a = matches_a[inlier_ind][:, :2]
+            inliers_b = matches_b[inlier_ind][:, :2]
+
+    # raise NotImplementedError(
+    #     "`ransac_fundamental_matrix` function in "
+    #     + "`ransac.py` needs to be implemented"
+    # )
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
