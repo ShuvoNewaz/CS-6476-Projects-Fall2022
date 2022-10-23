@@ -87,26 +87,34 @@ def ransac_fundamental_matrix(
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    iterations = calculate_num_ransac_iterations(.99, 9, .9)
-    threshold = 1e-5
+    np.random.seed(1)
+    # iterations = calculate_num_ransac_iterations(.99, 9, .9)
+    iterations = 3000
+    threshold = 0.05
     inlier_count = 0
 
     N = len(matches_a)
     matches_a = np.concatenate((matches_a, np.zeros((N, 1))), axis=1)
     matches_b = np.concatenate((matches_b, np.zeros((N, 1))), axis=1)
     for i in range(iterations):
-        idx = np.random.choice(len(matches_a), 9, replace=False)
+        idx = np.random.choice(N-1, 9, replace=False)
+        holdout_index = np.delete(np.arange(N), idx)
         temp_a = matches_a[idx]
         temp_b = matches_b[idx]
         temp_F = estimate_fundamental_matrix(temp_a, temp_b)
         
-        a_F_b = ((matches_b @ temp_F) * matches_a).sum(axis=1)
-        inlier_ind = np.where(a_F_b <= threshold)
-        if len(inlier_ind) > inlier_count:
-            inlier_count = len(inlier_ind)
+        a_F_b = ((matches_b[holdout_index] @ temp_F) * matches_a[holdout_index]).sum(axis=1)
+        inlier_ind = np.where(np.abs(a_F_b) <= threshold)
+        if len(inlier_ind[0]) > inlier_count:
+            inlier_count = len(inlier_ind[0])
+            inlier_ind_100 = np.arange(inlier_count)
+            np.random.shuffle(inlier_ind_100)
             best_F = temp_F
-            inliers_a = matches_a[inlier_ind][:, :2]
-            inliers_b = matches_b[inlier_ind][:, :2]
+            inliers_a = matches_a[holdout_index][inlier_ind_100][:100][:, :2]
+            inliers_b = matches_b[holdout_index][inlier_ind_100][:100][:, :2]
+            iter_count = i + 1
+    
+    # print('Number of iterations required:', iter_count)
 
     # raise NotImplementedError(
     #     "`ransac_fundamental_matrix` function in "
