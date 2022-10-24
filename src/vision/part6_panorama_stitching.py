@@ -3,7 +3,7 @@ import cv2
 from vision.part3_ransac import ransac_fundamental_matrix
 
 
-def HomographyMatrix(imageA, imageB):
+def HomographyMatrix(imageA, imageB, use_cv2=True):
     if len(imageA.shape) == 3:
         image1_bw = cv2.cvtColor(imageA, cv2.COLOR_BGR2GRAY)
     else:
@@ -32,20 +32,46 @@ def HomographyMatrix(imageA, imageB):
 
     dst_pts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1, 1, 2)
     src_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
+
     hA, wA = image1_bw.shape
     hB, wB = image2_bw.shape
-    homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
 
-    src_pts = np.squeeze(src_pts, axis=1).T.astype(int)
-    dst_pts = np.squeeze(dst_pts, axis=1).T.astype(int)
+    if use_cv2:
+        homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+        src_pts = np.squeeze(src_pts, axis=1).T.astype(int)
+        dst_pts = np.squeeze(dst_pts, axis=1).T.astype(int)
+        src_pts[0] = np.minimum(src_pts[0], hA - 1)
+        src_pts[1] = np.minimum(src_pts[1], wA - 1)
+        dst_pts[0] = np.minimum(dst_pts[0], hB - 1)
+        dst_pts[1] = np.minimum(dst_pts[1], wB - 1)
+        src_pts[[0, 1]] = src_pts[[1, 0]]
+        dst_pts[[0, 1]] = dst_pts[[1, 0]]        
+    else:
+        src_pts = np.squeeze(src_pts, axis=1).astype(int)
+        dst_pts = np.squeeze(dst_pts, axis=1).astype(int)
 
-    src_pts[0] = np.minimum(src_pts[0], hA - 1)
-    src_pts[1] = np.minimum(src_pts[1], wA - 1)
-    dst_pts[0] = np.minimum(dst_pts[0], hB - 1)
-    dst_pts[1] = np.minimum(dst_pts[1], wB - 1)
+        N = len(src_pts)
+        A = np.zeros((2*N, 8))
+        even_index = np.arange(0, 2*N, 2)
+        odd_index = np.arange(1, 2*N, 2)
+        
+        A[even_index, :2] = A[odd_index, 3:5] = src_pts
+        A[even_index, 6:] = -src_pts * dst_pts[:, 0][:, np.newaxis]
+        A[odd_index, 6:] = -src_pts * dst_pts[:, 1][:, np.newaxis]
+        A[even_index, 2] = A[odd_index, 5] = 1
 
-    src_pts[[0, 1]] = src_pts[[1, 0]]
-    dst_pts[[0, 1]] = dst_pts[[1, 0]]
+        B = np.zeros(2*N)
+        B[even_index] = dst_pts[:, 0]
+        B[odd_index] = dst_pts[:, 1]
+
+        M = np.linalg.inv((A.T @ A) + 1e-9) @ (A.T @ B)
+        homography = np.concatenate((M.T, [1])).reshape(3, 3)
+        src_pts[0] = np.minimum(src_pts[0], hA - 1)
+        src_pts[1] = np.minimum(src_pts[1], wA - 1)
+        dst_pts[0] = np.minimum(dst_pts[0], hB - 1)
+        dst_pts[1] = np.minimum(dst_pts[1], wB - 1)
+        src_pts = src_pts.T
+        dst_pts = dst_pts.T
     homography[:, [0, 1]] = homography[:, [1, 0]]
 
     return homography, src_pts, dst_pts
@@ -61,7 +87,7 @@ def FlattenImageCoordinates(image):
     image_coordinates = np.concatenate((X.reshape(1, M*N), Y.reshape(1, M*N)), axis=0)
 
     return image_coordinates
-
+    
 
 def WarpCoordinates(coordinates, homography):
     point_coordinates = np.concatenate((coordinates, np.ones((1, coordinates.shape[1]))), axis=0)
@@ -74,7 +100,7 @@ def WarpCoordinates(coordinates, homography):
     return projected_coordinates
 
 
-def panorama_stitch(imageA, imageB):
+def panorama_stitch(imageA, imageB, use_cv2=True):
     """
     ImageA and ImageB will be an image pair that you choose to stitch together
     to create your panorama. This can be your own image pair that you believe
@@ -118,7 +144,7 @@ def panorama_stitch(imageA, imageB):
     hA, wA = image1_bw.shape
     hB, wB = image2_bw.shape
 
-    homography, src_points, dst_points = HomographyMatrix(imageA, imageB)
+    homography, src_points, dst_points = HomographyMatrix(imageA, imageB, use_cv2)
     flattened_image_coordinates = FlattenImageCoordinates(imageB)
     projected_image_coordinates = WarpCoordinates(flattened_image_coordinates, homography)
     projected_image_x = projected_image_coordinates[0].reshape(wB, hB)
@@ -140,4 +166,4 @@ def panorama_stitch(imageA, imageB):
     #                             END OF YOUR CODE                            #
     ###########################################################################
 
-    return panorama#cv2.cvtColor(np.float32(panorama), cv2.COLOR_BGR2RGB)
+    return panorama
