@@ -277,7 +277,7 @@ class MultiLabelImageLoader(data.Dataset):
         ############################################################################
         return img
 
-    def __getitem__(self, index: int) -> Tuple[torch.Tensor, int]:
+    def __getitem__(self, index: int) -> Tuple[torch.Tensor, torch.Tensor]:
         """Fetches the item (image, label) at a given index.
 
         Note: Do not forget to apply the transforms, if they exist
@@ -291,10 +291,10 @@ class MultiLabelImageLoader(data.Dataset):
             index: Index
         Returns:
             img: image of shape (H,W)
-            class_idx: index of the ground truth class for this image
+            class_idxs: indices of shape (num_classes, ) of the ground truth classes for this image
         """
         img = None
-        class_idx = None
+        class_idxs = None
 
         ############################################################################
         # Student code start
@@ -308,7 +308,7 @@ class MultiLabelImageLoader(data.Dataset):
         ############################################################################
         # Student code end
         ############################################################################
-        return img, class_idx
+        return img, class_idxs
 
     def __len__(self) -> int:
         """Returns the number of items in the dataset.
