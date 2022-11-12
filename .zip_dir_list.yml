@@ -3,6 +3,8 @@ required_directories:
 required_files:
   - setup.cfg
   - pyproject.toml
+  - scene_attributes_train.csv
+  - scene_attributes_test.csv
 optional_directories:
   - additional_data
 optional_files:

@@ -2,6 +2,8 @@
 Utilities to be used along with the deep model
 """
 from typing import Union
+from matplotlib.pyplot import axis
+from numpy import dtype
 
 import torch
 from vision.my_resnet import MyResNet18
@@ -30,10 +32,14 @@ def compute_accuracy(logits: torch.Tensor, labels: torch.Tensor) -> float:
     # Student code begin
     ############################################################################
 
-    raise NotImplementedError(
-        "`compute_accuracy` function in "
-        + "`dl_utils.py` needs to be implemented"
-    )
+    prediction = torch.argmax(logits, dim=1)
+    batch_accuracy = torch.sum(prediction == labels) / len(labels)
+    batch_accuracy = batch_accuracy.cpu().item()
+
+    # raise NotImplementedError(
+    #     "`compute_accuracy` function in "
+    #     + "`dl_utils.py` needs to be implemented"
+    # )
 
     ############################################################################
     # Student code end
@@ -65,10 +71,14 @@ def compute_loss(
     # Student code begin
     ############################################################################
 
-    raise NotImplementedError(
-        "`compute_loss` function in "
-        + "`dl_utils.py` needs to be implemented"
-    )
+    loss = model.loss_criterion(model_output, target_labels)
+    if is_normalize:
+        loss /= len(model_output)
+
+    # raise NotImplementedError(
+    #     "`compute_loss` function in "
+    #     + "`dl_utils.py` needs to be implemented"
+    # )
 
     ############################################################################
     # Student code end
@@ -95,10 +105,14 @@ def compute_multilabel_accuracy(logits: torch.Tensor, labels: torch.Tensor) -> f
     # Student code begin
     ############################################################################
 
-    raise NotImplementedError(
-        "`compute_multilabel_accuracy` function in "
-        + "`dl_utils.py` needs to be implemented"
-    )
+    logits = torch.round(logits).int()
+    batch_accuracy = torch.sum(logits.ravel() == labels.ravel()) / len(logits.ravel())
+    batch_accuracy = batch_accuracy.cpu()
+
+    # raise NotImplementedError(
+    #     "`compute_multilabel_accuracy` function in "
+    #     + "`dl_utils.py` needs to be implemented"
+    # )
 
     ############################################################################
     # Student code end

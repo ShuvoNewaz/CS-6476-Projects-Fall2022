@@ -44,10 +44,27 @@ def generate_confusion_data(
     # Student code begins here
     ##########################################################################
 
-    raise NotImplementedError(
-        "`generate_confusion_data` function in "
-        + "`confusion_matrix.py` needs to be implemented"
-    )
+    preds = torch.from_numpy(preds)
+    targets = torch.from_numpy(targets)
+    if cuda:
+        preds = preds.cuda()
+        targets = targets.cuda()
+
+    class_labels = list(label_to_idx.keys())
+    class_labels.sort()
+
+    for i, (x, target) in enumerate(loader):
+        if cuda:
+            x = x.cuda()
+            model = model.cuda()
+        targets[i*batch_size:(i+1)*batch_size] = target
+        logit = model(x)
+        preds[i*batch_size:(i+1)*batch_size] = torch.argmax(logit, dim=1)
+        
+    # raise NotImplementedError(
+    #     "`generate_confusion_data` function in "
+    #     + "`confusion_matrix.py` needs to be implemented"
+    # )
 
     ##########################################################################
     # Student code ends here
@@ -97,25 +114,28 @@ def generate_confusion_matrix(
         ##########################################################################
         # Student code begins here
         ##########################################################################
-    
-        raise NotImplementedError(
-            "`generate_confusion_matrix` function in "
-            + "`confusion_matrix.py` needs to be implemented"
-        )
+
+        confusion_matrix[target, prediction] += 1
+
+        # raise NotImplementedError(
+        #     "`generate_confusion_matrix` function in "
+        #     + "`confusion_matrix.py` needs to be implemented"
+        # )
         
         ##########################################################################
         # Student code ends here
         ##########################################################################
-
     if normalize:
         ##########################################################################
         # Student code begins here
         ##########################################################################
+        
+        confusion_matrix /= np.sum(confusion_matrix, axis=1, keepdims=True)
     
-        raise NotImplementedError(
-            "`generate_confusion_matrix` function in "
-            + "`confusion_matrix.py` needs to be implemented"
-        )
+        # raise NotImplementedError(
+        #     "`generate_confusion_matrix` function in "
+        #     + "`confusion_matrix.py` needs to be implemented"
+        # )
     
         ##########################################################################
         # Student code ends here
@@ -275,10 +295,24 @@ def generate_accuracy_data(
     # Student code begins here
     ##########################################################################
 
-    raise NotImplementedError(
-            "`generate_accuracy_data` function in "
-            + "`confusion_matrix.py` needs to be implemented"
-        )
+    preds = torch.from_numpy(preds)
+    targets = torch.from_numpy(targets)
+    if cuda:
+        preds = preds.cuda()
+        targets = targets.cuda()
+
+    for i, (x, target) in enumerate(loader):
+        if cuda:
+            x = x.cuda()
+            model = model.cuda()
+        targets[i*batch_size:(i+1)*batch_size] = target
+        logit = model(x)
+        preds[i*batch_size:(i+1)*batch_size] = logit
+
+    # raise NotImplementedError(
+    #         "`generate_accuracy_data` function in "
+    #         + "`confusion_matrix.py` needs to be implemented"
+    #     )
 
     ##########################################################################
     # Student code ends here
@@ -324,10 +358,13 @@ def generate_accuracy_table(
     # Student code begins here
     ##########################################################################
 
-    raise NotImplementedError(
-            "`generate_accuracy_table` function in "
-            + "`confusion_matrix.py` needs to be implemented"
-        )
+    status = np.equal(targets, preds)
+    accuracy_table = status.sum(axis=0) / len(status)
+
+    # raise NotImplementedError(
+    #         "`generate_accuracy_table` function in "
+    #         + "`confusion_matrix.py` needs to be implemented"
+    #     )
 
     ##########################################################################
     # Student code ends here

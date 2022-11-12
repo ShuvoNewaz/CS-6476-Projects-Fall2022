@@ -4,7 +4,7 @@ from typing import Tuple, Union
 import matplotlib.pyplot as plt
 import torch
 import torchvision.transforms as transforms
-from vision.dl_utils import compute_accuracy, compute_loss, compute_multilabel_accuracy
+from vision.dl_utils import compute_accuracy, compute_loss, compute_multilabel_accuracy, save_trained_model_weights
 from vision.image_loader import ImageLoader, MultiLabelImageLoader
 from vision.multilabel_resnet import MultilabelResNet18
 from vision.my_resnet import MyResNet18
@@ -180,7 +180,7 @@ class Trainer:
         """Plots the loss history"""
         plt.figure()
         epoch_idxs = range(len(self.train_loss_history))
-
+        plt.xticks(epoch_idxs[::5], epoch_idxs[::5])
         plt.plot(epoch_idxs, self.train_loss_history, "-b", label="training")
         plt.plot(epoch_idxs, self.validation_loss_history, "-r", label="validation")
         plt.title("Loss history")
@@ -192,7 +192,8 @@ class Trainer:
     def plot_accuracy(self) -> None:
         """Plots the accuracy history"""
         plt.figure()
-        epoch_idxs = range(len(self.train_accuracy_history))
+        epoch_idxs = range(len(self.train_loss_history))
+        plt.xticks(epoch_idxs[::5], epoch_idxs[::5])
         plt.plot(epoch_idxs, self.train_accuracy_history, "-b", label="training")
         plt.plot(epoch_idxs, self.validation_accuracy_history, "-r", label="validation")
         plt.title("Accuracy history")
@@ -200,7 +201,6 @@ class Trainer:
         plt.ylabel("Accuracy")
         plt.xlabel("Epochs")
         plt.show()
-
 
 class MultiLabelTrainer:
     """Class that stores model training metadata."""
@@ -274,6 +274,7 @@ class MultiLabelTrainer:
 
     def run_training_loop(self, num_epochs: int) -> None:
         """Train for num_epochs, and validate after every epoch."""
+        # best_accuracy = 0
         for epoch_idx in range(num_epochs):
 
             train_loss, train_acc = self.train_epoch()
@@ -284,6 +285,9 @@ class MultiLabelTrainer:
             val_loss, val_acc = self.validate()
             self.validation_loss_history.append(val_loss)
             self.validation_accuracy_history.append(val_acc)
+            # if val_acc > best_accuracy:
+            #     best_accuracy = val_acc
+            #     save_trained_model_weights(self.model, out_dir="./src/vision")
 
             print(
                 f"Epoch:{epoch_idx + 1}"
@@ -348,7 +352,7 @@ class MultiLabelTrainer:
         """Plots the loss history"""
         plt.figure()
         epoch_idxs = range(len(self.train_loss_history))
-
+        plt.xticks(epoch_idxs[::5], epoch_idxs[::5])
         plt.plot(epoch_idxs, self.train_loss_history, "-b", label="training")
         plt.plot(epoch_idxs, self.validation_loss_history, "-r", label="validation")
         plt.title("Loss history")
@@ -361,6 +365,7 @@ class MultiLabelTrainer:
         """Plots the accuracy history"""
         plt.figure()
         epoch_idxs = range(len(self.train_accuracy_history))
+        plt.xticks(epoch_idxs[::5], epoch_idxs[::5])
         plt.plot(epoch_idxs, self.train_accuracy_history, "-b", label="training")
         plt.plot(epoch_idxs, self.validation_accuracy_history, "-r", label="validation")
         plt.title("Accuracy history")
