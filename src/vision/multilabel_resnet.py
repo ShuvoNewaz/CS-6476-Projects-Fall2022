@@ -38,7 +38,7 @@ class MultilabelResNet18(nn.Module):
         self.conv_layers = nn.Sequential(my_resnet.layer1, my_resnet.layer2, my_resnet.layer3, my_resnet.layer4)
         self.fc_layers = my_resnet.fc
 
-        self.loss_criterion = nn.BCELoss(reduction='sum')
+        self.loss_criterion = nn.BCELoss(reduction='mean')
         self.activation = nn.Sigmoid()
 
         # raise NotImplementedError(

@@ -125,9 +125,9 @@ def get_all_transforms(
     all_transforms = transforms.Compose([transforms.ToTensor(),
                                             transforms.Resize(inp_size),
                                             transforms.ColorJitter(),
-                                            transforms.RandomHorizontalFlip(0.6), # Comment
-                                            transforms.RandomCrop(inp_size), # Comment
-                                            transforms.RandomRotation(30), # Comment to obtain required accuracy in ResNets
+                                            # transforms.RandomHorizontalFlip(0.6), # Comment
+                                            # transforms.RandomCrop(inp_size), # Comment
+                                            # transforms.RandomRotation(30), # Comment to obtain required accuracy in ResNets
                                             transforms.Normalize(mean=pixel_mean, std=pixel_std)
                                         ])
 

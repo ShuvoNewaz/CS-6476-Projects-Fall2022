@@ -30,13 +30,13 @@ class MyResNet18(nn.Module):
         my_resnet.fc = nn.Linear(num_features, 15)
         self.my_resnet = my_resnet
 
-        self.conv_layers = nn.Sequential(*(list(my_resnet.children())[:-1]))
-        self.fc_layers = nn.Linear(num_features, 15)
+        # self.conv_layers = nn.Sequential(*(list(my_resnet.children())[:-1]))
+        # self.fc_layers = nn.Linear(num_features, 15)
 
-        # self.conv_layers = nn.Sequential(my_resnet.layer1, my_resnet.layer2, my_resnet.layer3, my_resnet.layer4)
-        # self.fc_layers = my_resnet.fc
+        self.conv_layers = nn.Sequential(my_resnet.layer1, my_resnet.layer2, my_resnet.layer3, my_resnet.layer4)
+        self.fc_layers = my_resnet.fc
 
-        self.loss_criterion = nn.CrossEntropyLoss(reduction='sum')
+        self.loss_criterion = nn.CrossEntropyLoss(reduction='mean')
 
         # raise NotImplementedError(
         #     "`__init__` function in "
@@ -63,10 +63,6 @@ class MyResNet18(nn.Module):
         ############################################################################
 
         model_output = self.my_resnet(x)
-        # model_output = self.conv_layers(x)
-        # model_output = torch.squeeze(model_output, dim=2)
-        # model_output = torch.squeeze(model_output, dim=2)
-        # model_output = self.fc_layers(model_output)
         
         # raise NotImplementedError(
         #     "`forward` function in "

@@ -35,7 +35,7 @@ class SimpleNet(nn.Module):
                                         nn.Linear(in_features=200, out_features=15)
                                         )
 
-        self.loss_criterion = nn.CrossEntropyLoss(reduction="sum")
+        self.loss_criterion = nn.CrossEntropyLoss(reduction="mean")
 
         # raise NotImplementedError(
         #     "`__init__` function in "
