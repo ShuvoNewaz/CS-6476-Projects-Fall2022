@@ -1,0 +1,15 @@
+README.md
+pyproject.toml
+setup.cfg
+src/vision/__init__.py
+src/vision/part1_dataloader.py
+src/vision/part2_baseline.py
+src/vision/part3_pointnet.py
+src/vision/part4_analysis.py
+src/vision/part5_positional_encoding.py
+src/vision/training.py
+src/vision/utils.py
+src/vision.egg-info/PKG-INFO
+src/vision.egg-info/SOURCES.txt
+src/vision.egg-info/dependency_links.txt
+src/vision.egg-info/top_level.txt

@@ -33,10 +33,26 @@ class Argoverse(Dataset):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`load_path_with_classes` function in "
-            + "`part1_dataloader.py` needs to be implemented"
-        )
+        class_list = os.listdir(data_root)
+        class_list.sort()
+
+        for class_label, class_name in enumerate(class_list):
+            class_dir = os.path.join(data_root, class_name)
+            if split == 'train':
+                for i in range(170):
+                    file_name = str(i) + '.txt'
+                    file_dir = os.path.join(class_dir, file_name)
+                    pairs.append((file_dir, class_label))
+            elif split == 'test':
+                for i in range(170, 200):
+                    file_name = str(i) + '.txt'
+                    file_dir = os.path.join(class_dir, file_name)
+                    pairs.append((file_dir, class_label))
+
+        # raise NotImplementedError(
+        #     "`load_path_with_classes` function in "
+        #     + "`part1_dataloader.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
@@ -65,10 +81,13 @@ class Argoverse(Dataset):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`get_class_dict` function in "
-            + "`part1_dataloader.py` needs to be implemented"
-        )
+        for class_label, class_name in enumerate(class_list):
+            classes[class_name] = class_label
+
+        # raise NotImplementedError(
+        #     "`get_class_dict` function in "
+        #     + "`part1_dataloader.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
@@ -94,9 +113,9 @@ class Argoverse(Dataset):
         """
         super().__init__()
         
-        file_label_pairs, classes = self.load_path_with_classes(split, data_root)
-        self.instances = file_label_pairs
-        self.class_dict = self.get_class_dict(classes)
+        self.file_label_pairs, self.classes = self.load_path_with_classes(split, data_root)
+        self.instances = self.file_label_pairs
+        self.class_dict = self.get_class_dict(self.classes)
         self.pad_size = pad_size
 
 
@@ -117,10 +136,21 @@ class Argoverse(Dataset):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`get_points_from_file` function in "
-            + "`part1_dataloader.py` needs to be implemented"
-        )
+        pts = []
+        with open(path, 'r') as f:
+            for line_number, line in enumerate(f):
+                if line_number == 0:
+                    continue
+                line = line.replace('\n', '')
+                line_elements = line.split(' ')
+                line_elements = list(map(float, line_elements))
+                pts.append(line_elements)
+        pts = torch.tensor(pts)
+
+        # raise NotImplementedError(
+        #     "`get_points_from_file` function in "
+        #     + "`part1_dataloader.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
@@ -147,10 +177,14 @@ class Argoverse(Dataset):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`pad_points` function in "
-            + "`part1_dataloader.py` needs to be implemented"
-        )
+        pts_full = pts
+        for i in range(self.pad_size - len(pts)):
+            pts_full = torch.concat((pts_full, pts[0].view(1, 3)))
+
+        # raise NotImplementedError(
+        #     "`pad_points` function in "
+        #     + "`part1_dataloader.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
@@ -181,10 +215,14 @@ class Argoverse(Dataset):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`__getitem__` function in "
-            + "`part1_dataloader.py` needs to be implemented"
-        )
+        file, label = self.file_label_pairs[i]
+        pts = self.get_points_from_file(file)
+        pts = self.pad_points(pts)
+
+        # raise NotImplementedError(
+        #     "`__getitem__` function in "
+        #     + "`part1_dataloader.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
@@ -206,10 +244,12 @@ class Argoverse(Dataset):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`__len__` function in "
-            + "`part1_dataloader.py` needs to be implemented"
-        )
+        l = len(self.file_label_pairs)
+
+        # raise NotImplementedError(
+        #     "`__len__` function in "
+        #     + "`part1_dataloader.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end

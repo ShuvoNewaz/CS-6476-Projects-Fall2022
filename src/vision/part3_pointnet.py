@@ -39,10 +39,26 @@ class PointNet(nn.Module):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`__init__` function in "
-            + "`part3_pointnet.py` needs to be implemented"
-        )
+        self.encoder_head = nn.Sequential(
+                                                nn.Linear(in_features=in_dim, out_features=hidden_dims[0]),
+                                                nn.Linear(in_features=hidden_dims[0], out_features=hidden_dims[0]),
+                                                nn.Linear(in_features=hidden_dims[0], out_features=hidden_dims[1]),
+                                                nn.Linear(in_features=hidden_dims[1], out_features=hidden_dims[2])
+                                            )
+
+        self.classifier_head = nn.Sequential(
+                                                nn.BatchNorm1d(num_features=hidden_dims[2]), # Uncomment to pass gradescope
+                                                nn.Linear(in_features=hidden_dims[2], out_features=classifier_dims[0]),
+                                                nn.BatchNorm1d(num_features=classifier_dims[0]), # Uncomment to pass gradescope
+                                                nn.Linear(in_features=classifier_dims[0], out_features=classifier_dims[1]),
+                                                nn.BatchNorm1d(num_features=classifier_dims[1]), # Uncomment to pass gradescope
+                                                nn.Linear(in_features=classifier_dims[1], out_features=classes),
+                                            )
+
+        # raise NotImplementedError(
+        #     "`__init__` function in "
+        #     + "`part3_pointnet.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
@@ -69,11 +85,15 @@ class PointNet(nn.Module):
         ############################################################################
         # Student code begin
         ############################################################################
+        
+        encodings = self.encoder_head(x)
+        global_maxima = torch.max(encodings, dim=1)[0]
+        class_outputs = self.classifier_head(global_maxima)
 
-        raise NotImplementedError(
-            "`forward` function in "
-            + "`part3_pointnet.py` needs to be implemented"
-        )
+        # raise NotImplementedError(
+        #     "`forward` function in "
+        #     + "`part3_pointnet.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end

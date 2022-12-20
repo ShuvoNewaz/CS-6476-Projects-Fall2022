@@ -35,10 +35,16 @@ def get_critical_indices(model: Union[PointNet, PointNetPosEncoding], pts: torch
     # Student code begin
     ############################################################################
 
-    raise NotImplementedError(
-        "`get_critical_indices` function in "
-        + "`part4_pointnet.py` needs to be implemented"
-    )
+    if len(pts.shape) == 2:
+            pts = torch.unsqueeze(pts, 0)
+    encodings = model(pts)[1]
+    crit_indices = torch.argmax(encodings, dim=1)
+    crit_indices = torch.unique(crit_indices)
+
+    # raise NotImplementedError(
+    #     "`get_critical_indices` function in "
+    #     + "`part4_pointnet.py` needs to be implemented"
+    # )
 
     ############################################################################
     # Student code end
@@ -91,10 +97,25 @@ def get_confusion_matrix(
     # Student code begin
     ############################################################################
 
-    raise NotImplementedError(
-        "`get_confusion_matrix` function in "
-        + "`part4_pointnet.py` needs to be implemented"
-    )
+    for i, pt in enumerate(loader):
+        one_hot_prediction = model(pt[0])[0]
+        if i == 0:
+            one_hot_predictions = one_hot_prediction
+            targets = pt[1]
+        else:
+            one_hot_predictions = torch.concat((one_hot_predictions, one_hot_prediction))
+            targets = torch.concat((targets, pt[1]))
+    predictions = torch.argmax(one_hot_predictions, dim=1)
+    confusion_matrix = np.zeros((num_classes, num_classes))
+    for target, prediction in zip(targets, predictions):
+        confusion_matrix[target, prediction] += 1
+    if normalize:
+         confusion_matrix /= np.sum(confusion_matrix, axis=1, keepdims=True)
+
+    # raise NotImplementedError(
+    #     "`get_confusion_matrix` function in "
+    #     + "`part4_pointnet.py` needs to be implemented"
+    # )
 
     ############################################################################
     # Student code end

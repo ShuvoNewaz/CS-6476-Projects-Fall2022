@@ -29,10 +29,13 @@ class Baseline(nn.Module):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`__init__` function in "
-            + "`part2_baseline.py` needs to be implemented"
-        )
+        self.voxel_resolution = voxel_resolution
+        self.classifier = torch.nn.Linear(self.voxel_resolution**3, classes, bias=True)
+
+        # raise NotImplementedError(
+        #     "`__init__` function in "
+        #     + "`part2_baseline.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
@@ -60,10 +63,20 @@ class Baseline(nn.Module):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`count_points` function in "
-            + "`part2_baseline.py` needs to be implemented"
-        )
+        B, N, in_dim = x.shape
+        for i in range(B):
+            count, bins = torch.histogramdd(x[i], bins=[self.voxel_resolution, self.voxel_resolution, self.voxel_resolution])
+            count = count.view(1, self.voxel_resolution**3)
+            count = count / N
+            if i == 0:
+                counts = count
+            else:
+                counts = torch.concat((counts, count))
+
+        # raise NotImplementedError(
+        #     "`count_points` function in "
+        #     + "`part2_baseline.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
@@ -90,10 +103,13 @@ class Baseline(nn.Module):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`forward` function in "
-            + "`part2_baseline.py` needs to be implemented"
-        )
+        counts = self.count_points(x)
+        class_outputs = self.classifier(counts)
+
+        # raise NotImplementedError(
+        #     "`forward` function in "
+        #     + "`part2_baseline.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end

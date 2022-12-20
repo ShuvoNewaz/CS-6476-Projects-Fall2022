@@ -45,10 +45,19 @@ class PointNetPosEncoding(nn.Module):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`__init__` function in "
-            + "`part5_positional_encoding.py` needs to be implemented"
-        )
+        self.encoding_dim = encoding_dim
+        self.point_net = PointNet(      
+                                        in_dim=6*encoding_dim,
+                                        classes=classes, 
+                                        hidden_dims=(64, 128, 1024), 
+                                        classifier_dims=(512, 256), 
+                                        pts_per_obj=pts_per_obj
+                                    )
+
+        # raise NotImplementedError(
+        #     "`__init__` function in "
+        #     + "`part5_positional_encoding.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
@@ -77,10 +86,26 @@ class PointNetPosEncoding(nn.Module):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`positional_encoding` function in "
-            + "`part5_positional_encoding.py` needs to be implemented"
-        )
+        x, y, z = xyz[:, :, 0], xyz[:, :, 1], xyz[:, :, 2]
+        B, N = xyz.shape[:2]
+        enc = torch.zeros((B, N, 6*self.encoding_dim))
+
+        for i in range(6):
+            for j in range(self.encoding_dim):
+                if i in [0, 1]:
+                    enc[:, :, 2*j] = torch.sin(2**j * torch.pi * x)
+                    enc[:, :, 2*j + 1] = torch.cos(2**j * torch.pi * x)
+                if i in [2, 3]:
+                    enc[:, :, 2*j + 2*self.encoding_dim] = torch.sin(2**j * torch.pi * y)
+                    enc[:, :, 2*j + 1 + 2*self.encoding_dim] = torch.cos(2**j * torch.pi * y)
+                if i in [4, 5]:
+                    enc[:, :, 2*j + 4*self.encoding_dim] = torch.sin(2**j * torch.pi * z)
+                    enc[:, :, 2*j + 1 + 4*self.encoding_dim] = torch.cos(2**j * torch.pi * z)
+
+        # raise NotImplementedError(
+        #     "`positional_encoding` function in "
+        #     + "`part5_positional_encoding.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
@@ -116,10 +141,15 @@ class PointNetPosEncoding(nn.Module):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`forward` function in "
-            + "`part5_positional_encoding.py` needs to be implemented"
-        )
+        enc = self.positional_encoding(x)
+        encodings = self.point_net.encoder_head(enc)
+        global_maxima = torch.max(encodings, dim=1)[0]
+        class_outputs = self.point_net.classifier_head(global_maxima)
+
+        # raise NotImplementedError(
+        #     "`forward` function in "
+        #     + "`part5_positional_encoding.py` needs to be implemented"
+        # )
 
         ############################################################################
         # Student code end
