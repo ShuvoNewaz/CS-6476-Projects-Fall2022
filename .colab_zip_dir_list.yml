@@ -1,0 +1,15 @@
+required_directories:
+  - src
+  - tests
+  - Camvid
+  - kitti
+  - src/vision
+  - dataset_lists
+required_files:
+  - setup.cfg
+  - pyproject.toml
+  - download_dataset.sh
+optional_directories:
+  - additional_data
+optional_files:
+  - README.txt

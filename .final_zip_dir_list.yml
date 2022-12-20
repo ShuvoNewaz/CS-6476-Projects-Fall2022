@@ -1,0 +1,13 @@
+required_directories:
+  - src
+  - initmodel
+  - exp/kitti/PSPNet/model/kitti_result
+required_files:
+  - setup.cfg
+  - pyproject.toml
+  # - download_dataset.sh
+  - grayscale_predictions.zip
+optional_directories:
+  - additional_data
+optional_files:
+  - README.txt
